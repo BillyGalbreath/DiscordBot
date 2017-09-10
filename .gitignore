@@ -1,0 +1,34 @@
+# Eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# Intellij
+out
+*.ipr
+*.iml
+*.iws
+.idea
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# Floobits
+.floo*
+
+# Gradle
+.gradle
+build
+
+# Other
+eclipse
+run
+*.class
+classes

@@ -1,0 +1,14 @@
+[{
+  "modid": "discordbot",
+  "name": "DiscordBot",
+  "description": "DiscordBot for Forge by Pl3x",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "pl3x.net",
+  "updateJSON": "",
+  "authorList": ["BillyGalbreath"],
+  "credits": "",
+  "logoFile": "assets/logo.png",
+  "screenshots": [],
+  "dependencies": []
+}]

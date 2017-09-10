@@ -1,0 +1,4 @@
+include ':Pl3xForgeClient'
+project(':Pl3xForgeClient').projectDir = new File(settingsDir, '../Pl3xForgeClient')
+include ':Pl3xForgeServer'
+project(':Pl3xForgeServer').projectDir = new File(settingsDir, '../Pl3xForgeServer')
