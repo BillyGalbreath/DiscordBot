@@ -1,6 +1,7 @@
 package net.pl3x.forge.discord.listener;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -8,7 +9,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.pl3x.forge.discord.DiscordBot;
 import net.pl3x.forge.discord.configuration.Lang;
-import net.pl3x.forge.server.data.PlayerDataProvider;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class MinecraftListener {
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -28,14 +32,31 @@ public class MinecraftListener {
         //
     }*/
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    private final Map<UUID, String> lastKnownNames = new HashMap<>();
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST) // happens FIRST
+    public void onPlayerJoinHighest(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.player != null) {
+            lastKnownNames.put(event.player.getUniqueID(),
+                    UsernameCache.getLastKnownUsername(event.player.getUniqueID()));
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST) // happens LAST
+    public void onPlayerJoinLowest(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.player != null) {
+            lastKnownNames.remove(event.player.getUniqueID());
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL) // happens MIDDLE
     public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.isCanceled() || event.player == null) {
             return;
         }
 
         String message;
-        String lastKnownName = event.player.getCapability(PlayerDataProvider.PLAYER_DATA_CAPABILITY, null).getLastKnownName();
+        String lastKnownName = lastKnownNames.get(event.player.getUniqueID());
         if (lastKnownName == null || lastKnownName.isEmpty()) {
             message = Lang.JOIN_FIRST_TIME_MESSAGE;
         } else if (!lastKnownName.equals(event.player.getName())) {
