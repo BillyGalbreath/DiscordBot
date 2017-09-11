@@ -8,6 +8,7 @@ import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.server.FMLServerHandler;
 import net.pl3x.forge.discord.DiscordBot;
 import net.pl3x.forge.discord.configuration.Configuration;
 import net.pl3x.forge.discord.configuration.Lang;
@@ -37,10 +38,14 @@ public class DiscordListener extends ListenerAdapter {
         message = message
                 .replace("{message}", event.getMessage().getContent().trim());
 
+        // broadcast message to all online players
         ITextComponent component = new TextComponentString(message);
-
         for (EntityPlayerMP player : playerList.getPlayers()) {
             player.sendMessage(component);
         }
+
+        // log message to console like normal chat
+        // we use a new thread here to mask JDA's long named thread b.s.
+        new Thread(() -> FMLServerHandler.instance().getServer().sendMessage(component), "Server thread").start();
     }
 }

@@ -25,7 +25,7 @@ public class Client extends ListenerAdapter {
         Logger.info("Logged in as " + getSelf().getName());
 
         // skin connection check because bot _is_ connected, but status doesnt say so yet
-        sendToDiscord(false, false, null, Lang.SERVER_STARTED);
+        sendToDiscord(false, null, Lang.SERVER_STARTED);
     }
 
     public void connect() {
@@ -122,14 +122,10 @@ public class Client extends ListenerAdapter {
     }
 
     public void sendToDiscord(String sender, String message) {
-        sendToDiscord(false, sender, message);
+        sendToDiscord(true, sender, message);
     }
 
-    public void sendToDiscord(boolean useWebhook, String sender, String message) {
-        sendToDiscord(true, useWebhook, sender, message);
-    }
-
-    public void sendToDiscord(boolean checkConnected, boolean useWebhook, String sender, String message) {
+    public void sendToDiscord(boolean checkConnected, String sender, String message) {
         if (checkConnected && !isConnected()) {
             return;
         }
@@ -146,7 +142,7 @@ public class Client extends ListenerAdapter {
             return;
         }
 
-        if (useWebhook) {
+        if (sender != null && !sender.isEmpty()) {
             WebhookUtil.sendMessage(channel, sender, message);
         } else {
             channel.sendMessage(message).queue();

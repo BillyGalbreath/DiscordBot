@@ -21,7 +21,7 @@ public class MinecraftListener {
             return;
         }
 
-        DiscordBot.getClient().sendToDiscord(true, event.getPlayer().getName(), event.getMessage());
+        DiscordBot.getClient().sendToDiscord(event.getPlayer().getName(), event.getMessage());
     }
 
     /*@SubscribeEvent(priority = EventPriority.LOWEST)

@@ -7,7 +7,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.pl3x.forge.discord.DiscordBot;
-import net.pl3x.forge.discord.Logger;
 import net.pl3x.forge.discord.configuration.ConfigWatcher;
 import net.pl3x.forge.discord.configuration.Configuration;
 import net.pl3x.forge.discord.configuration.Lang;
@@ -22,7 +21,7 @@ public class Proxy {
     public void preInit(FMLPreInitializationEvent event) {
         File configDir = new File(event.getModConfigurationDirectory(), DiscordBot.name);
 
-        configWatcher = new Thread(new ConfigWatcher(configDir.toPath()), Logger.colorizeConsole("&1Config&r"));
+        configWatcher = new Thread(new ConfigWatcher(configDir.toPath()), Lang.colorize("&1Config&r"));
         configWatcher.start();
 
         Configuration.reload(configDir);
@@ -46,7 +45,7 @@ public class Proxy {
     public void serverStopping(FMLServerStoppingEvent event) {
         configWatcher.interrupt();
 
-        DiscordBot.getClient().sendToDiscord(null, Lang.SERVER_STOPPED);
+        DiscordBot.getClient().sendToDiscord(Lang.SERVER_STOPPED);
 
         DiscordBot.getClient().disconnect();
     }
