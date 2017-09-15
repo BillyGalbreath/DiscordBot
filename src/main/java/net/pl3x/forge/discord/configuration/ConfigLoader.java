@@ -12,11 +12,14 @@ import java.nio.file.Files;
 
 abstract class ConfigLoader {
     private static JsonParser parser = new JsonParser();
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson gson = new GsonBuilder()
+            .disableHtmlEscaping() // stop converting <> tags to \u003c\u003e etc
+            .setPrettyPrinting() // make human readable for easier editing
+            .create();
 
     static <T> T loadConfig(T config, Class<T> clazz, File file) throws IOException {
         if (file.exists()) {
-            return gson.fromJson(new String(Files.readAllBytes(file.toPath())), clazz);
+            config = gson.fromJson(new String(Files.readAllBytes(file.toPath())), clazz);
         }
         return saveConfig(config, clazz, file);
     }

@@ -73,7 +73,8 @@ public class ConfigWatcher implements Runnable {
         public void run() {
             Iterator<ConfigType> iter = reloadQueue.iterator();
             while (iter.hasNext()) {
-                switch (iter.next()) {
+                ConfigType type = iter.next();
+                switch (type) {
                     case CONFIG:
                         Configuration.reload();
                         break;

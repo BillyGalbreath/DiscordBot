@@ -18,7 +18,7 @@ import net.pl3x.forge.discord.scheduler.Pl3xScheduler;
 import java.io.File;
 
 @Mod(modid = DiscordBot.modId, name = DiscordBot.name, version = DiscordBot.version,
-        serverSideOnly = true, acceptableRemoteVersions = "*", dependencies = "after:pl3xserver")
+        serverSideOnly = true, acceptableRemoteVersions = "*")
 public class DiscordBot {
     public static final String modId = "discordbot";
     public static final String name = "DiscordBot";
@@ -41,11 +41,11 @@ public class DiscordBot {
     public void preInit(FMLPreInitializationEvent event) {
         File configDir = new File(event.getModConfigurationDirectory(), DiscordBot.name);
 
-        configWatcher = new Thread(new ConfigWatcher(configDir.toPath()), Lang.colorize("&1Config&r"));
-        configWatcher.start();
-
         Configuration.reload(configDir);
         Lang.reload(configDir);
+
+        configWatcher = new Thread(new ConfigWatcher(configDir.toPath()), Lang.colorize("&1Config&r"));
+        configWatcher.start();
     }
 
     @Mod.EventHandler
