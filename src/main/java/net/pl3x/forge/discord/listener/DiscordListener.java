@@ -9,6 +9,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.server.FMLServerHandler;
+import net.pl3x.forge.discord.BotCommandSender;
 import net.pl3x.forge.discord.DiscordBot;
 import net.pl3x.forge.discord.configuration.Configuration;
 import net.pl3x.forge.discord.configuration.Lang;
@@ -31,15 +32,48 @@ public class DiscordListener extends ListenerAdapter {
             return; // ignore self
         }
 
-        String message = Lang.colorize(Lang.MINECRAFT_CHAT_FORMAT
-                .replace("{sender}", event.getAuthor().getName()));
+        String message = event.getMessage().getContent().trim();
+        if (message.isEmpty()) {
+            return; // cant send empty messages
+        }
+
+        String cmdTrigger = Configuration.getConfig().getCommandTrigger();
+        if (message.startsWith(cmdTrigger) && message.length() > cmdTrigger.length() &&
+                handleCommand(message.substring(cmdTrigger.length()))) {
+            return; // handled command
+        }
+
+        handleChat(event.getAuthor().getName(), message);
+    }
+
+    private boolean handleCommand(String message) {
+        String[] split = message.split(" ");
+        if (split.length == 0 || split[0] == null || split[0].isEmpty()) {
+            return false; // sanity check
+        }
+
+        // allowed commands
+        switch (split[0]) {
+            case "list":
+            case "tps":
+                break;
+            default:
+                return false;
+        }
+
+        return 0 < serverInstance.getCommandManager().executeCommand(
+                new BotCommandSender(serverInstance), "/" + message);
+    }
+
+    private void handleChat(String sender, String message) {
+        String chat = Lang.colorize(Lang.MINECRAFT_CHAT_FORMAT
+                .replace("{sender}", sender));
 
         // replace the message content without color parsing!
-        message = message
-                .replace("{message}", event.getMessage().getContent().trim());
+        chat = chat.replace("{message}", message);
 
         // broadcast message to all online players
-        ITextComponent component = new TextComponentString(message);
+        ITextComponent component = new TextComponentString(chat);
         for (EntityPlayerMP player : playerList.getPlayers()) {
             player.sendMessage(component);
         }

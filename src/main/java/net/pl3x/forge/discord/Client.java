@@ -126,6 +126,10 @@ public class Client extends ListenerAdapter {
     }
 
     public void sendToDiscord(boolean checkConnected, String sender, String message) {
+        if (message == null || message.isEmpty()) {
+            return;
+        }
+
         if (checkConnected && !isConnected()) {
             return;
         }
