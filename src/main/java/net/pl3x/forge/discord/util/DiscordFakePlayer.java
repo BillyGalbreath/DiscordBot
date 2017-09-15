@@ -1,4 +1,4 @@
-package net.pl3x.forge.discord;
+package net.pl3x.forge.discord.util;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.MinecraftServer;

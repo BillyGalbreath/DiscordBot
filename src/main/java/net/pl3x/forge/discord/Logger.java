@@ -9,7 +9,8 @@ import static org.apache.logging.log4j.Level.INFO;
 import static org.apache.logging.log4j.Level.WARN;
 
 public class Logger {
-    private static org.apache.logging.log4j.Logger logger = LogManager.getLogger(Lang.colorize("&3DiscordBot&r"));
+    private static org.apache.logging.log4j.Logger logger =
+            LogManager.getLogger(Lang.colorize("&3DiscordBot&r"));
 
     private Logger() {
     }

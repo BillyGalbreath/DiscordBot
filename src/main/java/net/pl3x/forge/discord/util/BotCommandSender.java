@@ -1,9 +1,10 @@
-package net.pl3x.forge.discord;
+package net.pl3x.forge.discord.util;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+import net.pl3x.forge.discord.DiscordBot;
 
 import javax.annotation.Nullable;
 

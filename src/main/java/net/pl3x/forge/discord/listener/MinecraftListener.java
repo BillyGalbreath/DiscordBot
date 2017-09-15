@@ -26,8 +26,9 @@ public class MinecraftListener {
         DiscordBot.getClient().sendToDiscord(event.getPlayer().getName(), event.getMessage());
     }
 
-    /*@SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onPlayerAchievement(AchievementEvent event) {
+    // waiting on https://github.com/MinecraftForge/MinecraftForge/pull/4257
+    /*@SubscribeEvent
+    public void onPlayerAdvancement(AdvancementGrantEvent event) {
         if (event.isCanceled()) {
             return;
         }

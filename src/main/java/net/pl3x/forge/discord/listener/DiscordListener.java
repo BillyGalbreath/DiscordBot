@@ -10,9 +10,9 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.pl3x.forge.discord.BotCommandSender;
+import net.pl3x.forge.discord.util.BotCommandSender;
 import net.pl3x.forge.discord.DiscordBot;
-import net.pl3x.forge.discord.DiscordFakePlayer;
+import net.pl3x.forge.discord.util.DiscordFakePlayer;
 import net.pl3x.forge.discord.configuration.Configuration;
 import net.pl3x.forge.discord.configuration.Lang;
 
