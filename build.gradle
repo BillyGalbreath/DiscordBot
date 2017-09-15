@@ -9,6 +9,7 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 
 def build = System.getenv()['BUILD_NUMBER'] ?: "SNAPSHOT"
@@ -37,8 +38,34 @@ repositories {
 }
 
 dependencies {
-    provided 'net.dv8tion:JDA:3.3.0_271'
-    provided 'com.vdurmont:emoji-java:3.2.0'
+    compile files('./libs/JDA-3.3.0_DEV-withDependencies-7c2369b-Sep14.jar')
+    compile 'com.vdurmont:emoji-java:3.2.0'
+}
+
+shadowJar {
+    classifier = ""
+    relocate "com.mashape.unirest", "deps.com.mashape.unirest"
+    relocate "com.neovisionaries.ws.client", "deps.com.neovisionaries.ws.client"
+    relocate "com.sun.jna", "deps.com.sun.jna"
+    relocate "com.vdurmont.emoji", "deps.com.vdurmont.emoji"
+    relocate "javax.sound", "deps.javax.sound"
+    relocate "javazoom", "deps.javazoom"
+    relocate "net.dv8tion.jda", "deps.net.dv8tion.jda"
+    relocate "net.sourceforge.jaad", "deps.net.sourceforge.jaad"
+    relocate "org.json", "deps.org.json"
+    relocate "org.kc7bfi.jflac", "deps.orgkc7bfi.jflac"
+    relocate "org.tritonus", "deps.org.tritonus"
+    relocate "tomp2p.opuswrapper", "deps.tomp2p.opuswrapper"
+
+    relocate "org.apache.http", "deps.org.apache.http"
+    relocate "org.apache.commons.collections4", "deps.org.apache.commons.collections4"
+    relocate "org.apache.commons.logging", "deps.org.apache.commons.logging"
+    relocate "org.apache.commons.codec", "deps.org.apache.commons.codec"
+    relocate "org.apache.commons.lang3", "deps.org.apache.commons.lang3"
+    dependencies {
+        include(dependency('net.dv8tion:JDA:3.3.0_271:withDependencies'))
+        include(dependency('com.vdurmont:emoji-java:3.2.0'))
+    }
 }
 
 processResources {
@@ -61,3 +88,6 @@ jar {
         configurations.provided.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+
+reobf { shadowJar { mappingType = "SEARGE" } }
+tasks.reobfShadowJar.mustRunAfter shadowJar
