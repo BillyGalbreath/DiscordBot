@@ -13,7 +13,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 
 def build = System.getenv()['BUILD_NUMBER'] ?: "SNAPSHOT"
-version = "1.1-b" + build
+version = "1.0-b" + build
 group = "net.pl3x.forge.discord"
 archivesBaseName = project.name
 
@@ -38,8 +38,7 @@ repositories {
 }
 
 dependencies {
-    //compile 'net.dv8tion:JDA:3.3.0_263'
-    compile files('./libs/JDA-3.3.0_DEV-withDependencies-7c2369b-Sep14.jar')
+    compile 'net.dv8tion:JDA:3.3.0_271'
     compile 'com.vdurmont:emoji-java:3.2.0'
 }
 
@@ -64,7 +63,7 @@ shadowJar {
     relocate "org.apache.commons.codec", "deps.org.apache.commons.codec"
     relocate "org.apache.commons.lang3", "deps.org.apache.commons.lang3"
     dependencies {
-        include(dependency('net.dv8tion:JDA:3.3.0_DEV:withDependencies'))
+        include(dependency('net.dv8tion:JDA:3.3.0_271:withDependencies'))
         include(dependency('com.vdurmont:emoji-java:3.2.0'))
     }
 }
