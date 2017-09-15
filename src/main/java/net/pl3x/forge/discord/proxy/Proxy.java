@@ -45,7 +45,7 @@ public class Proxy {
     public void serverStopping(FMLServerStoppingEvent event) {
         configWatcher.interrupt();
 
-        DiscordBot.getClient().sendToDiscord(Lang.SERVER_STOPPED);
+        DiscordBot.getClient().sendToDiscord(Lang.getData().SERVER_STOPPED);
 
         DiscordBot.getClient().disconnect();
     }

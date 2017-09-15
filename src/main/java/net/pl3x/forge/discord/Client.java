@@ -25,7 +25,7 @@ public class Client extends ListenerAdapter {
         Logger.info("Logged in as " + getSelf().getName());
 
         // skin connection check because bot _is_ connected, but status doesnt say so yet
-        sendToDiscord(false, null, Lang.SERVER_STARTED);
+        sendToDiscord(false, null, Lang.getData().SERVER_STARTED);
     }
 
     public void connect() {

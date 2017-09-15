@@ -2,15 +2,17 @@ package net.pl3x.forge.discord.listener;
 
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.server.FMLServerHandler;
 import net.pl3x.forge.discord.BotCommandSender;
 import net.pl3x.forge.discord.DiscordBot;
+import net.pl3x.forge.discord.DiscordFakePlayer;
 import net.pl3x.forge.discord.configuration.Configuration;
 import net.pl3x.forge.discord.configuration.Lang;
 
@@ -66,20 +68,21 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     private void handleChat(String sender, String message) {
-        String chat = Lang.colorize(Lang.MINECRAFT_CHAT_FORMAT
-                .replace("{sender}", sender));
+        // we use a new thread here to mask JDA's long named thread b.s. in console/log output
+        new Thread(() -> {
+            // add chat message formatting
+            String formatted = Lang.colorize(Lang.getData().MINECRAFT_CHAT_FORMAT) + message;
 
-        // replace the message content without color parsing!
-        chat = chat.replace("{message}", message);
+            // let chat plugin handle overall chat formatting
+            ServerChatEvent event = new ServerChatEvent(new DiscordFakePlayer(serverInstance, sender), formatted,
+                    new TextComponentTranslation("chat.type.text", sender, ForgeHooks.newChatWithLinks(formatted)));
+            if (MinecraftForge.EVENT_BUS.post(event)) {
+                return; // event cancelled
+            }
 
-        // broadcast message to all online players
-        ITextComponent component = new TextComponentString(chat);
-        for (EntityPlayerMP player : playerList.getPlayers()) {
-            player.sendMessage(component);
-        }
-
-        // log message to console like normal chat
-        // we use a new thread here to mask JDA's long named thread b.s.
-        new Thread(() -> FMLServerHandler.instance().getServer().sendMessage(component), "Server thread").start();
+            // broadcast message to minecraft with discord prefix
+            playerList.sendMessage(new TextComponentString(Lang.colorize(Lang.getData().MINECRAFT_CHAT_PREFIX))
+                    .appendSibling(event.getComponent()));
+        }, "Server thread").start();
     }
 }
