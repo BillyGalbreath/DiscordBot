@@ -39,7 +39,7 @@ repositories {
 
 dependencies {
     //compile 'net.dv8tion:JDA:3.3.0_263'
-    compile files('./libs/JDA-3.3.0_DEV-withDependencies.jar')
+    compile files('./libs/JDA-3.3.0_DEV-withDependencies-7c2369b-Sep14.jar')
     compile 'com.vdurmont:emoji-java:3.2.0'
 }
 
