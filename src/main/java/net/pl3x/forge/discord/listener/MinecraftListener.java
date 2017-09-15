@@ -1,6 +1,10 @@
 package net.pl3x.forge.discord.listener;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ServerChatEvent;
@@ -10,20 +14,45 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.pl3x.forge.discord.DiscordBot;
 import net.pl3x.forge.discord.configuration.Lang;
+import net.pl3x.forge.discord.util.ItemUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class MinecraftListener {
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST) // happens LAST
     public void onChatMessage(ServerChatEvent event) {
         if (event.isCanceled() || event.getPlayer() == null ||
                 event.getPlayer() instanceof FakePlayer) {
             return;
         }
 
-        DiscordBot.getClient().sendToDiscord(event.getPlayer().getName(), event.getMessage());
+        String itemName = "";
+        String itemTooltip = "";
+
+        ITextComponent component = event.getComponent();
+        for (ITextComponent sibling : component.getSiblings()) {
+            HoverEvent hover = sibling.getStyle().getHoverEvent();
+            if (hover != null && hover.getAction() == HoverEvent.Action.SHOW_ITEM) {
+                itemName = sibling.getFormattedText();
+                try {
+                    itemTooltip = String.join("\n", ItemUtil.getTooltip(event.getPlayer(),
+                            new ItemStack(JsonToNBT.getTagFromJson(hover.getValue().getUnformattedText()))));
+                } catch (Exception ignore) {
+                    itemTooltip = "Invalid Item!";
+                }
+                break; // stop looking
+            }
+        }
+
+        String text = event.getMessage();
+        if (!itemName.isEmpty() && !itemTooltip.isEmpty()) {
+            text += "```" + itemTooltip + "```";
+        }
+
+        DiscordBot.getClient().sendToDiscord(event.getPlayer().getName(),
+                Lang.stripColor(text.replaceAll("\\[item]", itemName)));
     }
 
     // waiting on https://github.com/MinecraftForge/MinecraftForge/pull/4257

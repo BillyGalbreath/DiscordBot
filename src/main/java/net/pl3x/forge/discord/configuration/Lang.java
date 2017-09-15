@@ -42,6 +42,10 @@ public class Lang extends ConfigLoader {
         return string.replaceAll("(?i)&([a-f0-9k-or])", "\u00a7$1");
     }
 
+    public static String stripColor(String string) {
+        return string.replaceAll("(?i)\u00a7([a-f0-9k-or])", "");
+    }
+
     public static class Data {
         public String SERVER_STARTED = ":white_check_mark: **Server has started**";
         public String SERVER_STOPPED = ":octagonal_sign: **Server has stopped**";

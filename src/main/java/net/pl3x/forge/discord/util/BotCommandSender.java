@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.pl3x.forge.discord.DiscordBot;
+import net.pl3x.forge.discord.configuration.Lang;
 
 import javax.annotation.Nullable;
 
@@ -38,6 +39,6 @@ public class BotCommandSender implements ICommandSender {
 
     @Override
     public void sendMessage(ITextComponent component) {
-        DiscordBot.getClient().sendToDiscord(component.getFormattedText().replaceAll("(?i)\u00a7([a-f0-9k-or])", ""));
+        DiscordBot.getClient().sendToDiscord(Lang.stripColor(component.getFormattedText()));
     }
 }
