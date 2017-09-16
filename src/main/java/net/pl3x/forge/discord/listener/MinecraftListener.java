@@ -21,6 +21,17 @@ import java.util.Map;
 import java.util.UUID;
 
 public class MinecraftListener {
+    private final Map<UUID, String> lastKnownNames = new HashMap<>();
+
+    // waiting on https://github.com/MinecraftForge/MinecraftForge/pull/4257
+    /*@SubscribeEvent
+    public void onPlayerAdvancement(AdvancementGrantEvent event) {
+        if (event.isCanceled()) {
+            return;
+        }
+        //
+    }*/
+
     @SubscribeEvent(priority = EventPriority.LOWEST) // happens LAST
     public void onChatMessage(ServerChatEvent event) {
         if (event.isCanceled() || event.getPlayer() == null ||
@@ -54,17 +65,6 @@ public class MinecraftListener {
         DiscordBot.getClient().sendToDiscord(event.getPlayer().getName(),
                 Lang.stripColor(text.replaceAll("\\[item]", itemName)));
     }
-
-    // waiting on https://github.com/MinecraftForge/MinecraftForge/pull/4257
-    /*@SubscribeEvent
-    public void onPlayerAdvancement(AdvancementGrantEvent event) {
-        if (event.isCanceled()) {
-            return;
-        }
-        //
-    }*/
-
-    private final Map<UUID, String> lastKnownNames = new HashMap<>();
 
     @SubscribeEvent(priority = EventPriority.HIGHEST) // happens FIRST
     public void onPlayerJoinHighest(PlayerEvent.PlayerLoggedInEvent event) {

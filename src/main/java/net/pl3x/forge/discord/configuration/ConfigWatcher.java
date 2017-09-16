@@ -64,6 +64,17 @@ public class ConfigWatcher implements Runnable {
         Logger.warn("ConfigWatcher has stopped");
     }
 
+    private enum ConfigType {
+        CONFIG(Configuration.FILE_NAME),
+        LANG(Lang.FILE_NAME);
+
+        String file;
+
+        ConfigType(String file) {
+            this.file = file;
+        }
+    }
+
     private class ReloadConfig extends Pl3xRunnable {
         ReloadConfig(ConfigType type) {
             reloadQueue.add(type);
@@ -84,17 +95,6 @@ public class ConfigWatcher implements Runnable {
                 }
                 iter.remove();
             }
-        }
-    }
-
-    private enum ConfigType {
-        CONFIG(Configuration.FILE_NAME),
-        LANG(Lang.FILE_NAME);
-
-        String file;
-
-        ConfigType(String file) {
-            this.file = file;
         }
     }
 }
