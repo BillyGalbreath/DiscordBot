@@ -50,7 +50,6 @@ public class Lang extends ConfigLoader {
         public String SERVER_STARTED = ":white_check_mark: **Server has started**";
         public String SERVER_STOPPED = ":octagonal_sign: **Server has stopped**";
         public String MINECRAFT_CHAT_PREFIX = "&7[&3D&7]";
-        public String MINECRAFT_CHAT_FORMAT = "&7&o";
         public String ADVANCEMENT_MESSAGE = ":medal: {message}";
         public String DEATH_MESSAGE = ":skull_crossbones: **{message}**";
         public String JOIN_MESSAGE = ":heavy_plus_sign: **{player} joined the game**";

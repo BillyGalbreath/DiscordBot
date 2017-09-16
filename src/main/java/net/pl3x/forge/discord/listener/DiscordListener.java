@@ -70,12 +70,9 @@ public class DiscordListener extends ListenerAdapter {
     private void handleChat(String sender, String message) {
         // we use a new thread here to mask JDA's long named thread b.s. in console/log output
         new Thread(() -> {
-            // add chat message formatting
-            String formatted = Lang.colorize(Lang.getData().MINECRAFT_CHAT_FORMAT) + message;
-
             // let chat plugin handle overall chat formatting
-            ServerChatEvent event = new ServerChatEvent(new DiscordFakePlayer(serverInstance, sender), formatted,
-                    new TextComponentTranslation("chat.type.text", sender, ForgeHooks.newChatWithLinks(formatted)));
+            ServerChatEvent event = new ServerChatEvent(new DiscordFakePlayer(serverInstance, sender), message,
+                    new TextComponentTranslation("chat.type.text", sender, ForgeHooks.newChatWithLinks(message)));
             if (MinecraftForge.EVENT_BUS.post(event)) {
                 return; // event cancelled
             }
