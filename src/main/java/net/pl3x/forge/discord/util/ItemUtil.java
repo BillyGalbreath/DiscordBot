@@ -11,6 +11,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemEnchantedBook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -44,6 +45,9 @@ public class ItemUtil {
         if (stack.hasTagCompound()) {
             if ((hideFlags & 1) == 0) {
                 NBTTagList tagList = stack.getEnchantmentTagList();
+                if (stack.getItem() == Items.ENCHANTED_BOOK) {
+                    tagList = ItemEnchantedBook.getEnchantments(stack);
+                }
 
                 for (int j = 0; j < tagList.tagCount(); ++j) {
                     NBTTagCompound nbttagcompound = tagList.getCompoundTagAt(j);
