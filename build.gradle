@@ -54,6 +54,7 @@ shadowJar {
     relocate "net.sourceforge.jaad", "deps.net.sourceforge.jaad"
     relocate "org.json", "deps.org.json"
     relocate "org.kc7bfi.jflac", "deps.orgkc7bfi.jflac"
+    relocate "org.slf4j", "deps.org.slf4j"
     relocate "org.tritonus", "deps.org.tritonus"
     relocate "tomp2p.opuswrapper", "deps.tomp2p.opuswrapper"
 
