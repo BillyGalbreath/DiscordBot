@@ -23,14 +23,22 @@ import java.util.UUID;
 public class MinecraftListener {
     private final Map<UUID, String> lastKnownNames = new HashMap<>();
 
-    // waiting on https://github.com/MinecraftForge/MinecraftForge/pull/4257
-    /*@SubscribeEvent
-    public void onPlayerAdvancement(AdvancementGrantEvent event) {
-        if (event.isCanceled()) {
-            return;
+    /*
+    @SubscribeEvent
+    public void onAdvancement(AdvancementGrantEvent.Post event) {
+        EntityPlayer player = event.getEntityPlayer();
+        Advancement advancement = event.getAdvancement();
+
+        if (advancement.getDisplay() != null && advancement.getDisplay().shouldAnnounceToChat() &&
+                player.world.getGameRules().getBoolean("announceAdvancements")) {
+            DiscordBot.getClient().sendToDiscord(Lang.getData().ADVANCEMENT_MESSAGE
+                    .replace("{message}", new TextComponentTranslation("chat.type.advancement." +
+                            advancement.getDisplay().getFrame().getName(),
+                            player.getDisplayName(),
+                            advancement.getDisplayText()).getFormattedText()));
         }
-        //
-    }*/
+    }
+    */
 
     @SubscribeEvent(priority = EventPriority.LOWEST) // happens LAST
     public void onChatMessage(ServerChatEvent event) {
