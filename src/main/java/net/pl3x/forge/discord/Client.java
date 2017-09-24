@@ -3,12 +3,14 @@ package net.pl3x.forge.discord;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.SelfUser;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.minecraftforge.fml.server.FMLServerHandler;
 import net.pl3x.forge.discord.configuration.Configuration;
 import net.pl3x.forge.discord.configuration.Lang;
 import net.pl3x.forge.discord.util.WebhookUtil;
@@ -23,6 +25,8 @@ public class Client extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent event) {
         Logger.info("Logged in as " + getSelf().getName());
+
+        jda.getPresence().setGame(Game.of("Minecraft " + FMLServerHandler.instance().getServer().getMinecraftVersion()));
 
         // skin connection check because bot _is_ connected, but status doesnt say so yet
         sendToDiscord(false, null, Lang.getData().SERVER_STARTED);
