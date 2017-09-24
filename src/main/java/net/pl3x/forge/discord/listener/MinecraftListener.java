@@ -1,14 +1,19 @@
 package net.pl3x.forge.discord.listener;
 
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.DisplayInfo;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.AdvancementGrantEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -23,22 +28,48 @@ import java.util.UUID;
 public class MinecraftListener {
     private final Map<UUID, String> lastKnownNames = new HashMap<>();
 
-    /*
     @SubscribeEvent
     public void onAdvancement(AdvancementGrantEvent.Post event) {
         EntityPlayer player = event.getEntityPlayer();
         Advancement advancement = event.getAdvancement();
 
-        if (advancement.getDisplay() != null && advancement.getDisplay().shouldAnnounceToChat() &&
-                player.world.getGameRules().getBoolean("announceAdvancements")) {
-            DiscordBot.getClient().sendToDiscord(Lang.getData().ADVANCEMENT_MESSAGE
-                    .replace("{message}", new TextComponentTranslation("chat.type.advancement." +
-                            advancement.getDisplay().getFrame().getName(),
-                            player.getDisplayName(),
-                            advancement.getDisplayText()).getFormattedText()));
+        if (advancement.getDisplay() == null ||
+                !advancement.getDisplay().shouldAnnounceToChat() ||
+                !player.world.getGameRules().getBoolean("announceAdvancements")) {
+            return; // do not display this advancement
         }
+
+        DisplayInfo display = advancement.getDisplay();
+
+        String playerName = player.getDisplayName().getFormattedText();
+
+        String frame = display.getFrame().getName();
+
+        String title = display.getTitle().getFormattedText();
+        String desc = display.getDescription().getFormattedText();
+
+        String type = String.format(I18n.translateToLocal("chat.type.advancement." + frame), "", "").trim();
+
+        String icon;
+        switch (frame) {
+            case "challenge":
+                icon = Lang.getData().ADVANCEMENT_ICON_CHALLENGE;
+                break;
+            case "goal":
+                icon = Lang.getData().ADVANCEMENT_ICON_GOAL;
+                break;
+            default:
+                icon = Lang.getData().ADVANCEMENT_ICON_TASK;
+        }
+
+        DiscordBot.getClient().sendToDiscord(Lang.stripColor(Lang.getData().ADVANCEMENT_MESSAGE
+                .replace("{icon}", icon)
+                .replace("{player}", playerName)
+                .replace("{type}", type)
+                .replace("{title}", title)
+                .replace("{description}", desc)
+        ));
     }
-    */
 
     @SubscribeEvent(priority = EventPriority.LOWEST) // happens LAST
     public void onChatMessage(ServerChatEvent event) {
