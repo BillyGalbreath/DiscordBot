@@ -17,7 +17,7 @@ apply plugin: 'java'
 def mcVersion = "1.12.2"
 def forgeVersion = "14.23.0"
 def mappingsVersion = "20171003"
-def pl3xVersion = "57"
+def pl3xVersion = "58"
 def build = System.getenv()['BUILD_NUMBER'] ?: "SNAPSHOT"
 version = "1.6-b" + build
 
