@@ -175,7 +175,6 @@ public class MinecraftListener {
         }
         StringBuilder sb = new StringBuilder();
         for (char c : message.toCharArray()) {
-            System.out.println("Test Char: " + c);
             EmojiConfig.Emoji emoji = EmojiConfig.INSTANCE.data.getEmoji(c);
             if (emoji == null) {
                 sb.append(c);
