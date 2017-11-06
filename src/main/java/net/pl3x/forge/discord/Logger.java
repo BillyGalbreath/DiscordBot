@@ -1,6 +1,6 @@
 package net.pl3x.forge.discord;
 
-import net.pl3x.forge.discord.configuration.Lang;
+import net.pl3x.forge.discord.util.ChatColor;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 
@@ -10,13 +10,13 @@ import static org.apache.logging.log4j.Level.WARN;
 
 public class Logger {
     private static org.apache.logging.log4j.Logger logger =
-            LogManager.getLogger(Lang.colorize("&3DiscordBot&r"));
+            LogManager.getLogger(ChatColor.colorize("&3DiscordBot&r"));
 
     private Logger() {
     }
 
     public static void log(Level level, String message) {
-        logger.log(level, Lang.colorize(message));
+        logger.log(level, ChatColor.colorize(message));
     }
 
     public static void error(String message) {

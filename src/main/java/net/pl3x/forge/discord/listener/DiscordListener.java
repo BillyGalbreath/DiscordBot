@@ -11,10 +11,14 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.pl3x.forge.discord.DiscordBot;
-import net.pl3x.forge.discord.configuration.Configuration;
+import net.pl3x.forge.discord.configuration.DiscordConfig;
+import net.pl3x.forge.discord.configuration.EmojiConfig;
 import net.pl3x.forge.discord.configuration.Lang;
 import net.pl3x.forge.discord.util.BotCommandSender;
+import net.pl3x.forge.discord.util.ChatColor;
 import net.pl3x.forge.discord.util.DiscordFakePlayer;
+
+import java.util.regex.Matcher;
 
 public class DiscordListener extends ListenerAdapter {
     private static MinecraftServer serverInstance = FMLCommonHandler.instance().getMinecraftServerInstance();
@@ -22,7 +26,7 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getTextChannel().getIdLong() != Configuration.getConfig().getChannelID()) {
+        if (event.getTextChannel().getIdLong() != DiscordConfig.INSTANCE.data.getChannelID()) {
             return; // not our channel
         }
 
@@ -39,7 +43,7 @@ public class DiscordListener extends ListenerAdapter {
             return; // cant send empty messages
         }
 
-        String cmdTrigger = Configuration.getConfig().getCommandTrigger();
+        String cmdTrigger = DiscordConfig.INSTANCE.data.getCommandTrigger();
         if (message.startsWith(cmdTrigger) && message.length() > cmdTrigger.length() &&
                 handleCommand(message.substring(cmdTrigger.length()))) {
             return; // handled command
@@ -70,16 +74,44 @@ public class DiscordListener extends ListenerAdapter {
     private void handleChat(String sender, String message) {
         // we use a new thread here to mask JDA's long named thread b.s. in console/log output
         new Thread(() -> {
+            final String msg = translateMessage(message);
+
             // let chat plugin handle overall chat formatting
-            ServerChatEvent event = new ServerChatEvent(new DiscordFakePlayer(serverInstance, sender), message,
-                    new TextComponentTranslation("chat.type.text", sender, ForgeHooks.newChatWithLinks(message)));
+            ServerChatEvent event = new ServerChatEvent(new DiscordFakePlayer(serverInstance, sender), msg,
+                    new TextComponentTranslation("chat.type.text", sender, ForgeHooks.newChatWithLinks(msg)));
             if (MinecraftForge.EVENT_BUS.post(event)) {
                 return; // event cancelled
             }
 
             // broadcast message to minecraft with discord prefix
-            playerList.sendMessage(new TextComponentString(Lang.colorize(Lang.getData().MINECRAFT_CHAT_PREFIX))
+            playerList.sendMessage(new TextComponentString(ChatColor.colorize(Lang.INSTANCE.data.MINECRAFT_CHAT_PREFIX))
                     .appendSibling(event.getComponent()));
         }, "Server thread").start();
+    }
+
+    public String translateMessage(String message) {
+        if (message == null) {
+            return null;
+        }
+
+        Matcher match = EmojiConfig.EMOJI_TAG_REGEX_PATTERN.matcher(message);
+        while (match.find()) {
+            String code = match.group(1);
+            if (code == null) {
+                continue;
+            }
+            EmojiConfig.Emoji emoji = EmojiConfig.INSTANCE.data.getEmojis().stream()
+                    .filter(e -> e.getAliases().contains(code.toLowerCase()))
+                    .findFirst().orElse(null);
+            if (emoji == null) {
+                continue;
+            }
+            message = message.replace(":" + code + ":",
+                    String.valueOf((char) Integer.parseInt(emoji.getHex(), 16)));
+        }
+        for (EmojiConfig.Emoji emoji : EmojiConfig.INSTANCE.data.getEmojis()) {
+            message = message.replace(emoji.getEmoji(), String.valueOf((char) Integer.parseInt(emoji.getHex(), 16)));
+        }
+        return message;
     }
 }

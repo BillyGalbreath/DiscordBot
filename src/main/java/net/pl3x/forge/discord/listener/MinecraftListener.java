@@ -18,7 +18,9 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.pl3x.forge.discord.DiscordBot;
+import net.pl3x.forge.discord.configuration.EmojiConfig;
 import net.pl3x.forge.discord.configuration.Lang;
+import net.pl3x.forge.discord.util.ChatColor;
 import net.pl3x.forge.discord.util.ItemUtil;
 
 import java.util.HashMap;
@@ -53,22 +55,22 @@ public class MinecraftListener {
         String icon;
         switch (frame) {
             case "challenge":
-                icon = Lang.getData().ADVANCEMENT_ICON_CHALLENGE;
+                icon = Lang.INSTANCE.data.ADVANCEMENT_ICON_CHALLENGE;
                 break;
             case "goal":
-                icon = Lang.getData().ADVANCEMENT_ICON_GOAL;
+                icon = Lang.INSTANCE.data.ADVANCEMENT_ICON_GOAL;
                 break;
             default:
-                icon = Lang.getData().ADVANCEMENT_ICON_TASK;
+                icon = Lang.INSTANCE.data.ADVANCEMENT_ICON_TASK;
         }
 
-        DiscordBot.getClient().sendToDiscord(Lang.stripColor(Lang.getData().ADVANCEMENT_MESSAGE
+        DiscordBot.getClient().sendToDiscord(ChatColor.stripAllCodes(translateMessage(Lang.INSTANCE.data.ADVANCEMENT_MESSAGE
                 .replace("{icon}", icon)
                 .replace("{player}", playerName)
                 .replace("{type}", type)
                 .replace("{title}", title)
                 .replace("{description}", desc)
-        ));
+        )));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST) // happens LAST
@@ -102,7 +104,7 @@ public class MinecraftListener {
         }
 
         DiscordBot.getClient().sendToDiscord(event.getPlayer().getName(),
-                Lang.stripColor(text.replaceAll("\\[item]", itemName)));
+                ChatColor.stripAllCodes(translateMessage(text).replaceAll("\\[item]", itemName)));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST) // happens FIRST
@@ -129,17 +131,17 @@ public class MinecraftListener {
         String message;
         String lastKnownName = lastKnownNames.get(event.player.getUniqueID());
         if (lastKnownName == null || lastKnownName.isEmpty()) {
-            message = Lang.getData().JOIN_FIRST_TIME_MESSAGE;
+            message = Lang.INSTANCE.data.JOIN_FIRST_TIME_MESSAGE;
         } else if (!lastKnownName.equals(event.player.getName())) {
-            message = Lang.getData().JOIN_NAME_CHANGED_MESSAGE
+            message = Lang.INSTANCE.data.JOIN_NAME_CHANGED_MESSAGE
                     .replace("{oldname}", lastKnownName);
         } else {
-            message = Lang.getData().JOIN_MESSAGE;
+            message = Lang.INSTANCE.data.JOIN_MESSAGE;
         }
 
         message = message.replace("{player}", event.player.getName());
 
-        DiscordBot.getClient().sendToDiscord(message);
+        DiscordBot.getClient().sendToDiscord(translateMessage(message));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -148,10 +150,10 @@ public class MinecraftListener {
             return;
         }
 
-        String message = Lang.getData().QUIT_MESSAGE
+        String message = Lang.INSTANCE.data.QUIT_MESSAGE
                 .replace("{player}", event.player.getName());
 
-        DiscordBot.getClient().sendToDiscord(message);
+        DiscordBot.getClient().sendToDiscord(translateMessage(message));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -160,10 +162,28 @@ public class MinecraftListener {
             return;
         }
 
-        String message = Lang.getData().DEATH_MESSAGE
+        String message = Lang.INSTANCE.data.DEATH_MESSAGE
                 .replace("{message}", ((EntityPlayerMP) event.getEntity())
                         .getCombatTracker().getDeathMessage().getUnformattedText());
 
-        DiscordBot.getClient().sendToDiscord(message);
+        DiscordBot.getClient().sendToDiscord(translateMessage(message));
+    }
+
+    public String translateMessage(String message) {
+        if (message == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (char c : message.toCharArray()) {
+            System.out.println("Test Char: " + c);
+            EmojiConfig.Emoji emoji = EmojiConfig.INSTANCE.data.getEmoji(c);
+            if (emoji == null) {
+                sb.append(c);
+                continue;
+            }
+            sb.append(emoji.getEmoji());
+        }
+
+        return sb.toString();
     }
 }

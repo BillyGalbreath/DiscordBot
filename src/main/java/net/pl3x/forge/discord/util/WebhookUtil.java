@@ -10,7 +10,7 @@ import net.dv8tion.jda.core.requests.RestAction;
 import net.dv8tion.jda.core.requests.Route;
 import net.pl3x.forge.discord.DiscordBot;
 import net.pl3x.forge.discord.Logger;
-import net.pl3x.forge.discord.configuration.Configuration;
+import net.pl3x.forge.discord.configuration.DiscordConfig;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class WebhookUtil {
             for (Guild guild : DiscordBot.getClient().getJda().getGuilds()) {
                 for (Webhook webhook : guild.getWebhooks().complete()) {
                     if (webhook.getName().startsWith("DiscordBot") &&
-                            Configuration.getConfig().getChannelID() !=
+                            DiscordConfig.INSTANCE.data.getChannelID() !=
                                     webhook.getChannel().getIdLong()) {
                         webhook.delete().reason("Purge").queue();
                     }

@@ -9,7 +9,8 @@ import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.pl3x.forge.discord.configuration.ConfigWatcher;
-import net.pl3x.forge.discord.configuration.Configuration;
+import net.pl3x.forge.discord.configuration.DiscordConfig;
+import net.pl3x.forge.discord.configuration.EmojiConfig;
 import net.pl3x.forge.discord.configuration.Lang;
 import net.pl3x.forge.discord.listener.DiscordListener;
 import net.pl3x.forge.discord.listener.MinecraftListener;
@@ -22,12 +23,12 @@ import java.io.File;
 public class DiscordBot {
     public static final String modId = "discordbot";
     public static final String name = "DiscordBot";
-    public static final String version = "@VERSION@";
+    public static final String version = "@DEV_BUILD@";
 
     private static final Pl3xScheduler pl3xScheduler = new Pl3xScheduler();
     private static Client client = new Client();
 
-    private Thread configWatcher;
+    public static File configDir;
 
     public static Pl3xScheduler getScheduler() {
         return pl3xScheduler;
@@ -39,13 +40,13 @@ public class DiscordBot {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        File configDir = new File(event.getModConfigurationDirectory(), DiscordBot.name);
+        configDir = new File(event.getModConfigurationDirectory(), DiscordBot.name);
 
-        Configuration.reload(configDir);
-        Lang.reload(configDir);
+        Lang.INSTANCE.init();
+        DiscordConfig.INSTANCE.init();
+        EmojiConfig.INSTANCE.init();
 
-        configWatcher = new Thread(new ConfigWatcher(configDir.toPath()), Lang.colorize("&1Config&r"));
-        configWatcher.start();
+        ConfigWatcher.INSTANCE.start();
     }
 
     @Mod.EventHandler
@@ -61,8 +62,9 @@ public class DiscordBot {
 
     @Mod.EventHandler
     public void serverStopping(FMLServerStoppingEvent event) {
-        configWatcher.interrupt();
-        client.sendToDiscord(Lang.getData().SERVER_STOPPED);
+        ConfigWatcher.INSTANCE.interrupt();
+
+        client.sendToDiscord(Lang.INSTANCE.data.SERVER_STOPPED);
         client.disconnect();
     }
 

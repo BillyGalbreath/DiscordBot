@@ -11,8 +11,8 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 
 abstract class ConfigLoader {
-    private static JsonParser parser = new JsonParser();
-    private static Gson gson = new GsonBuilder()
+    private static final JsonParser parser = new JsonParser();
+    private static final Gson gson = new GsonBuilder()
             .disableHtmlEscaping() // stop converting <> tags to \u003c\u003e etc
             .setPrettyPrinting() // make human readable for easier editing
             .create();

@@ -11,7 +11,7 @@ import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.minecraftforge.fml.server.FMLServerHandler;
-import net.pl3x.forge.discord.configuration.Configuration;
+import net.pl3x.forge.discord.configuration.DiscordConfig;
 import net.pl3x.forge.discord.configuration.Lang;
 import net.pl3x.forge.discord.util.WebhookUtil;
 
@@ -29,7 +29,7 @@ public class Client extends ListenerAdapter {
         jda.getPresence().setGame(Game.of("Minecraft " + FMLServerHandler.instance().getServer().getMinecraftVersion()));
 
         // skin connection check because bot _is_ connected, but status doesnt say so yet
-        sendToDiscord(false, null, Lang.getData().SERVER_STARTED);
+        sendToDiscord(false, null, Lang.INSTANCE.data.SERVER_STARTED);
     }
 
     public void connect() {
@@ -38,7 +38,7 @@ public class Client extends ListenerAdapter {
             return;
         }
 
-        String token = Configuration.getConfig().getBotToken();
+        String token = DiscordConfig.INSTANCE.data.getBotToken();
         if (token == null || token.isEmpty()) {
             Logger.error("Missing token");
             return;
@@ -138,7 +138,7 @@ public class Client extends ListenerAdapter {
             return;
         }
 
-        long channelId = Configuration.getConfig().getChannelID();
+        long channelId = DiscordConfig.INSTANCE.data.getChannelID();
         TextChannel channel = jda.getTextChannelById(channelId);
         if (channel == null) {
             Logger.error("Could not find channel " + channelId);

@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 buildscript {
     repositories {
         jcenter()
@@ -12,10 +14,15 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 
+def mcVersion = "1.12.2"
+def forgeVersion = "14.23.0"
+def mappingsVersion = "20171003"
+def pl3xVersion = "57"
 def build = System.getenv()['BUILD_NUMBER'] ?: "SNAPSHOT"
-version = "1.5-b" + build
+version = "1.6-b" + build
+
 group = "net.pl3x.forge.discord"
-archivesBaseName = project.name
+archivesBaseName = "DiscordBot"
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
@@ -23,13 +30,13 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.0.0"
+    version = mcVersion + "-" + forgeVersion + ".0"
     runDir = "run"
 
-    replace "@VERSION@", project.version
+    replace "@DEV_BUILD@", project.version
     replaceIn "DiscordBot.java"
 
-    mappings = "snapshot_20170919"
+    mappings = "snapshot_" + mappingsVersion
     makeObfSourceJar = false
 }
 
@@ -38,8 +45,8 @@ repositories {
 }
 
 dependencies {
-    compile files('./libs/JDA-3.3.1_DEV-withDependencies-7160efd-Sep22.jar')
-    compile 'com.vdurmont:emoji-java:3.2.0'
+    compile files('./libs/JDA-3.3.1_DEV-withDependencies-72d5a74-Nov4.jar')
+    compile 'com.vdurmont:emoji-java:4.0.0'
 }
 
 shadowJar {
@@ -65,7 +72,7 @@ shadowJar {
     relocate "org.apache.commons.lang3", "deps.org.apache.commons.lang3"
     dependencies {
         include(dependency('net.dv8tion:JDA:3.3.1_DEV:withDependencies'))
-        include(dependency('com.vdurmont:emoji-java:3.2.0'))
+        include(dependency('com.vdurmont:emoji-java:4.0.0'))
     }
 }
 
@@ -92,3 +99,40 @@ jar {
 
 reobf { shadowJar { mappingType = "SEARGE" } }
 tasks.reobfShadowJar.mustRunAfter shadowJar
+
+task setupPl3xForge {
+    group = "forgegradle"
+    description = "Download the Pl3xForge userdev file for ForgeGradle"
+    doFirst {
+        println "Checking directory structures..."
+        def pl3xDir = new File(System.getProperty("user.home"), ".gradle" + File.separator + "pl3x")
+        if (!pl3xDir.exists()) {
+            println "Missing pl3x directory. Creating..."
+            pl3xDir.mkdirs()
+        }
+        def userdevDir = new File(System.getProperty("user.home"), ".gradle" + File.separator + "caches" + File.separator + "minecraft" +
+                File.separator + "net" + File.separator + "minecraftforge" + File.separator + "forge" + File.separator +
+                mcVersion + "-" + forgeVersion + ".0" + File.separator + "snapshot" + File.separator + mappingsVersion)
+        if (!userdevDir.exists()) {
+            println "Missing userdev directory. Creating..."
+            userdevDir.mkdirs()
+        }
+        println "Checking userdev files..."
+        def userdevFile = new File(userdevDir, "forge-" + (String) project.minecraft.version + "-" + forgeVersion + ".0-userdev.jar")
+        def tmpFile = new File(pl3xDir, "forge-" + mcVersion + "-" + forgeVersion + "." + pl3xVersion + "-userdev.jar")
+        if (!tmpFile.exists() || !userdevFile.exists()) {
+            println "Downloading missing Pl3xForge userdev jar (build " + pl3xVersion + ")..."
+            new URL("http://pl3x.net/jenkins/job/MinecraftForge/" + pl3xVersion +
+                    "/artifact/build/distributions/forge-" + mcVersion + "-" + forgeVersion + "." + pl3xVersion + "-userdev.jar")
+                    .withInputStream { i -> tmpFile.withOutputStream { it << i } }
+            println "Preparing Pl3xForge jar (build " + pl3xVersion + ")..."
+            for (File f : userdevDir.listFiles()) {
+                f.delete()
+            }
+            Files.copy(tmpFile.toPath(), userdevFile.toPath())
+        }
+        println "Everything up to date!"
+        println ""
+        println "Please run setupDecompWorkspace task now."
+    }
+}
