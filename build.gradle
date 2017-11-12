@@ -16,10 +16,11 @@ apply plugin: 'java'
 
 def mcVersion = "1.12.2"
 def forgeVersion = "14.23.0"
+def forgeBuild = "2538"
 def mappingsVersion = "20171003"
-def pl3xVersion = "58"
+def pl3xVersion = "71"
 def build = System.getenv()['BUILD_NUMBER'] ?: "SNAPSHOT"
-version = "1.6-b" + build
+version = mcVersion + "-b" + build
 
 group = "net.pl3x.forge.discord"
 archivesBaseName = "DiscordBot"
@@ -119,11 +120,11 @@ task setupPl3xForge {
         }
         println "Checking userdev files..."
         def userdevFile = new File(userdevDir, "forge-" + (String) project.minecraft.version + "-" + forgeVersion + ".0-userdev.jar")
-        def tmpFile = new File(pl3xDir, "forge-" + mcVersion + "-" + forgeVersion + "." + pl3xVersion + "-userdev.jar")
+        def tmpFile = new File(pl3xDir, "forge-" + mcVersion + "-" + forgeVersion + "." + forgeBuild + "." + pl3xVersion + "-userdev.jar")
         if (!tmpFile.exists() || !userdevFile.exists()) {
             println "Downloading missing Pl3xForge userdev jar (build " + pl3xVersion + ")..."
             new URL("http://pl3x.net/jenkins/job/MinecraftForge/" + pl3xVersion +
-                    "/artifact/build/distributions/forge-" + mcVersion + "-" + forgeVersion + "." + pl3xVersion + "-userdev.jar")
+                    "/artifact/build/distributions/forge-" + mcVersion + "-" + forgeVersion + "." + forgeBuild + "." + pl3xVersion + "-userdev.jar")
                     .withInputStream { i -> tmpFile.withOutputStream { it << i } }
             println "Preparing Pl3xForge jar (build " + pl3xVersion + ")..."
             for (File f : userdevDir.listFiles()) {
