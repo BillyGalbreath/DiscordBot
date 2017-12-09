@@ -15,10 +15,10 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 
 def mcVersion = "1.12.2"
-def forgeVersion = "14.23.0"
-def forgeBuild = "2540"
+def forgeVersion = "14.23.1"
+def forgeBuild = "2562"
 def mappingsVersion = "20171003"
-def pl3xVersion = "73"
+def pl3xVersion = "105"
 def build = System.getenv()['BUILD_NUMBER'] ?: "SNAPSHOT"
 version = mcVersion + "-b" + build
 

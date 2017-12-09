@@ -13,7 +13,7 @@ import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.AdvancementGrantEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -31,7 +31,7 @@ public class MinecraftListener {
     private final Map<UUID, String> lastKnownNames = new HashMap<>();
 
     @SubscribeEvent
-    public void onAdvancement(AdvancementGrantEvent.Post event) {
+    public void onAdvancement(AdvancementEvent event) {
         EntityPlayer player = event.getEntityPlayer();
         Advancement advancement = event.getAdvancement();
 
