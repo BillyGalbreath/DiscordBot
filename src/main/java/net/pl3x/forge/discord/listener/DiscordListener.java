@@ -5,10 +5,6 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.pl3x.forge.discord.DiscordBot;
 import net.pl3x.forge.discord.configuration.DiscordConfig;
@@ -17,7 +13,6 @@ import net.pl3x.forge.discord.configuration.Lang;
 import net.pl3x.forge.discord.scheduler.Pl3xRunnable;
 import net.pl3x.forge.discord.util.BotCommandSender;
 import net.pl3x.forge.discord.util.ChatColor;
-import net.pl3x.forge.discord.util.DiscordFakePlayer;
 
 import java.util.regex.Matcher;
 
@@ -77,17 +72,12 @@ public class DiscordListener extends ListenerAdapter {
         DiscordBot.getScheduler().runTaskLater(new Pl3xRunnable() {
             @Override
             public void run() {
-                final String msg = translateMessage(message);
-
-                // let chat plugin handle overall chat formatting
-                ServerChatEvent event = new ServerChatEvent(new DiscordFakePlayer(serverInstance, sender), msg,
-                        new TextComponentTranslation("chat.type.text", sender, ForgeHooks.newChatWithLinks(msg)));
-                if (MinecraftForge.EVENT_BUS.post(event)) {
-                    return; // event cancelled
-                }
                 // broadcast message to minecraft with discord prefix
-                playerList.sendMessage(new TextComponentString(ChatColor.colorize(Lang.INSTANCE.data.MINECRAFT_CHAT_PREFIX))
-                        .appendSibling(event.getComponent()));
+                playerList.sendMessage(new TextComponentString(ChatColor.colorize(
+                        Lang.INSTANCE.data.MINECRAFT_CHAT_PREFIX +
+                                DiscordConfig.INSTANCE.data.getChatFormat()
+                                        .replace("{sender}", sender)
+                ).replace("{message}", translateMessage(message))));
             }
         }, 1);
     }
