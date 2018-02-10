@@ -14,6 +14,7 @@ import net.pl3x.forge.discord.DiscordBot;
 import net.pl3x.forge.discord.configuration.DiscordConfig;
 import net.pl3x.forge.discord.configuration.EmojiConfig;
 import net.pl3x.forge.discord.configuration.Lang;
+import net.pl3x.forge.discord.scheduler.Pl3xRunnable;
 import net.pl3x.forge.discord.util.BotCommandSender;
 import net.pl3x.forge.discord.util.ChatColor;
 import net.pl3x.forge.discord.util.DiscordFakePlayer;
@@ -72,21 +73,23 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     private void handleChat(String sender, String message) {
-        // we use a new thread here to mask JDA's long named thread b.s. in console/log output
-        new Thread(() -> {
-            final String msg = translateMessage(message);
+        // get on the main thread
+        DiscordBot.getScheduler().runTaskLater(new Pl3xRunnable() {
+            @Override
+            public void run() {
+                final String msg = translateMessage(message);
 
-            // let chat plugin handle overall chat formatting
-            ServerChatEvent event = new ServerChatEvent(new DiscordFakePlayer(serverInstance, sender), msg,
-                    new TextComponentTranslation("chat.type.text", sender, ForgeHooks.newChatWithLinks(msg)));
-            if (MinecraftForge.EVENT_BUS.post(event)) {
-                return; // event cancelled
+                // let chat plugin handle overall chat formatting
+                ServerChatEvent event = new ServerChatEvent(new DiscordFakePlayer(serverInstance, sender), msg,
+                        new TextComponentTranslation("chat.type.text", sender, ForgeHooks.newChatWithLinks(msg)));
+                if (MinecraftForge.EVENT_BUS.post(event)) {
+                    return; // event cancelled
+                }
+                // broadcast message to minecraft with discord prefix
+                playerList.sendMessage(new TextComponentString(ChatColor.colorize(Lang.INSTANCE.data.MINECRAFT_CHAT_PREFIX))
+                        .appendSibling(event.getComponent()));
             }
-
-            // broadcast message to minecraft with discord prefix
-            playerList.sendMessage(new TextComponentString(ChatColor.colorize(Lang.INSTANCE.data.MINECRAFT_CHAT_PREFIX))
-                    .appendSibling(event.getComponent()));
-        }, "Server thread").start();
+        }, 1);
     }
 
     public String translateMessage(String message) {
