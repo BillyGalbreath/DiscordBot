@@ -1,7 +1,6 @@
 package net.pl3x.forge.discord.util;
 
 import com.google.common.collect.Maps;
-import net.minecraft.util.text.TextFormatting;
 
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -35,6 +34,8 @@ public enum ChatColor {
     public static final Pattern FORMAT_PATTERN = Pattern.compile("(?i)" + COLOR_CHAR + "([k-or])");
     public static final Pattern ALTERNATE_COLOR_PATTERN = Pattern.compile("(?i)&([0-9A-FR])");
     public static final Pattern ALTERNATE_FORMAT_PATTERN = Pattern.compile("(?i)&([k-or])");
+    public static final Pattern FORMATTING_CODE_PATTERN = Pattern.compile("(?i)\u00a7([0-9A-FK-OR])");
+    public static final Pattern ALTERNATE_CODE_PATTERN = Pattern.compile("(?i)&([0-9A-FK-OR])");
     private final static Map<Character, ChatColor> BY_CHAR = Maps.newHashMap();
 
     static {
@@ -58,7 +59,7 @@ public enum ChatColor {
     }
 
     public static String colorize(String string) {
-        return TextFormatting.ALTERNATE_CODE_PATTERN.matcher(string).replaceAll(COLOR_CHAR + "$1");
+        return ALTERNATE_CODE_PATTERN.matcher(string).replaceAll(COLOR_CHAR + "$1");
     }
 
     public static String colorsOnly(String string) {
@@ -70,7 +71,7 @@ public enum ChatColor {
     }
 
     public static String stripAllCodes(String string) {
-        return TextFormatting.FORMATTING_CODE_PATTERN.matcher(TextFormatting.ALTERNATE_CODE_PATTERN.matcher(string).replaceAll(COLOR_CHAR + "$1")).replaceAll("");
+        return FORMATTING_CODE_PATTERN.matcher(ALTERNATE_CODE_PATTERN.matcher(string).replaceAll(COLOR_CHAR + "$1")).replaceAll("");
     }
 
     public static String stripOnlyColors(String string) {
